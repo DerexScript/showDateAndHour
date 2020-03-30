@@ -1,0 +1,6 @@
+#include "resource.h"
+//-------------------Manifest---------------------------
+#define RT_MANIFEST 24
+showDateAndHour_MANIFEST RT_MANIFEST "showDateAndHour.exe.manifest"
+//------------------------------------------------------
+

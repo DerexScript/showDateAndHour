@@ -1,0 +1,298 @@
+#ifndef MYWINMAIN_H_INCLUDED
+#define MYWINMAIN_H_INCLUDED
+
+void getTm( int &year, int &month, int &day, int &hour, int &mins, int &secs ) {
+    time_t tt;
+    time(&tt);
+    tm TM = *localtime(&tt);
+    year    = TM.tm_year + 1900;
+    month   = TM.tm_mon+1;
+    day     = TM.tm_mday;
+    hour    = TM.tm_hour;
+    mins    = TM.tm_min;
+    secs    = TM.tm_sec;
+}
+
+DWORD WINAPI ShowDateAndHour(LPVOID lpParameter) {
+    while(true) {
+        int year, month, day, hour, mins, secs;
+        char yearC[33], monthC[33], dayC[33], hourC[33], minsC[33], secsC[33];
+        char /*yearCC[33] = {},*/ monthCC[33], dayCC[33], hourCC[33], minsCC[33], secsCC[33];
+        //string yearS, monthS, dayS, hourS, minsS, secsS;
+        getTm(year, month, day, hour, mins, secs);
+        itoa(year,yearC,10);
+        itoa(month,monthC,10);
+        itoa(day,dayC,10);
+        itoa(hour,hourC,10);
+        itoa(mins,minsC,10);
+        itoa(secs,secsC,10);
+
+        /*yearS = to_string(year);
+        monthS = to_string(month);
+        dayS = to_string(day);
+        hourS = to_string(hour);
+        minsS = to_string(mins);
+        secsS = to_string(secs);
+        */
+
+        if(secs >= 0 && secs <= 9) {
+            strcpy(secsCC, (char *)"0");
+            strcat(secsCC, secsC);
+        } else {
+            strcpy(secsCC, secsC);
+        }
+        if(mins >= 0 && mins <= 9) {
+            strcpy(minsCC, (char *)"0");
+            strcat(secsCC, minsC);
+        } else {
+            strcpy(minsCC, minsC);
+        }
+        if(hour >= 0 && hour <= 9) {
+            strcpy(hourCC, (char *)"0");
+            strcat(hourCC, hourC);
+        } else {
+            strcpy(hourCC, hourC);
+        }
+        if(day >= 0 && day <= 9) {
+            strcpy(dayCC, (char *)"0");
+            strcat(dayCC, dayC);
+        } else {
+            strcpy(dayCC, dayC);
+        }
+        if(month >= 0 && month <= 9) {
+            strcpy(monthCC, (char *)"0");
+            strcat(monthCC, monthC);
+        } else {
+            strcpy(monthCC, monthC);
+        }
+
+        std::cout << "local: " << dayCC << "/" << monthCC << "/" << yearC << " " << hourCC << ":" << minsCC << ":" << secsCC << std::endl;
+
+        SendMessage(staticDate, WM_SETTEXT, 0, (LPARAM)dayCC);
+        SendMessage(staticMonth, WM_SETTEXT, 0, (LPARAM)monthCC);
+        SendMessage(staticYear, WM_SETTEXT, 0, (LPARAM)yearC);
+        SendMessage(staticHour, WM_SETTEXT, 0, (LPARAM)hourCC);
+        SendMessage(staticMinutes, WM_SETTEXT, 0, (LPARAM)minsCC);
+        SendMessage(staticSeconds, WM_SETTEXT, 0, (LPARAM)secsCC);
+
+        /*
+        if(secs == 59){ SendMessage(staticSeconds, WM_SETTEXT, 0, (LPARAM)"  "); }
+        if(mins == 59 && secs == 59){ SendMessage(staticMinutes, WM_SETTEXT, 0, (LPARAM)"  "); }
+        if(month == 12 && day == 31 && hour == 23 && mins == 59 && secs == 59){ SendMessage(staticMonth, WM_SETTEXT, 0, (LPARAM)"  "); }
+        if(day > 27 && hour == 23 && mins == 59 && secs == 59){ SendMessage(staticDate, WM_SETTEXT, 0, (LPARAM)"  "); }
+        if(hour == 23 && mins == 59 && secs == 59){ SendMessage(staticHour, WM_SETTEXT, 0, (LPARAM)"  "); }
+        */
+
+        memset(dayC, 0, sizeof(dayC));
+        memset(monthC, 0, sizeof(monthC));
+        memset(yearC, 0, sizeof(yearC));
+        memset(hourC, 0, sizeof(hourC));
+        memset(minsC, 0, sizeof(minsC));
+        memset(secsC, 0, sizeof(secsC));
+        ZeroMemory(&dayC, sizeof(dayC));
+        ZeroMemory(&monthC, sizeof(monthC));
+        ZeroMemory(&yearC, sizeof(yearC));
+        ZeroMemory(&hourC, sizeof(hourC));
+        ZeroMemory(&minsC, sizeof(minsC));
+        ZeroMemory(&secsC, sizeof(secsC));
+
+
+
+        memset(dayC, 0, sizeof(dayCC));
+        memset(monthC, 0, sizeof(monthCC));
+        //memset(yearC, 0, sizeof(yearCC));
+        memset(hourC, 0, sizeof(hourCC));
+        memset(minsC, 0, sizeof(minsCC));
+        memset(secsC, 0, sizeof(secsCC));
+        ZeroMemory(&dayC, sizeof(dayCC));
+        ZeroMemory(&monthC, sizeof(monthCC));
+        //ZeroMemory(&yearC, sizeof(yearCC));
+        ZeroMemory(&hourC, sizeof(hourCC));
+        ZeroMemory(&minsC, sizeof(minsCC));
+        ZeroMemory(&secsC, sizeof(secsCC));
+
+
+        day = 0;
+        month = 0;
+        year = 0;
+        hour = 0;
+        mins = 0;
+        secs = 0;
+        Sleep(1000);
+    }
+}
+
+static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp) {
+    //((std::string*)userp)->append((char*)contents, size * nmemb);
+    strcpy((char *)userp, (char*)contents);
+    return size * nmemb;
+}
+
+
+char * curlGetContent(char * url) {
+    char *readBuffer = new char[150];
+    if(strcmp(url, (char *)"http://teste.clockapi.net/") != 0) {
+        CURL *curl;
+        CURLcode res;
+        curl = curl_easy_init();
+        if(curl) {
+            curl_easy_setopt(curl, CURLOPT_URL, url);
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, readBuffer);
+            res = curl_easy_perform(curl);
+            curl_easy_cleanup(curl);
+            //std::cout << res << CURLE_OK <<  std::endl;
+            //std::cout << readBuffer  <<  std::endl;
+            if(CURLE_OK == res) {
+                readBuffer[strlen(readBuffer)-2] = '\0';
+                return readBuffer;
+            }
+        }
+        strcpy(readBuffer, (char *)"{\"day\" : \"30\", \"month\" : \"03\", \"year\" : \"2020\", \"hour\" : \"17\", \"minutes\" : \"32\", \"seconds\" : \"33\" }");
+        readBuffer[strlen(readBuffer)] = '\0';
+        return readBuffer;
+    } else {
+        strcpy(readBuffer, (char *)"{\"day\" : \"30\", \"month\" : \"03\", \"year\" : \"2020\", \"hour\" : \"17\", \"minutes\" : \"32\", \"seconds\" : \"33\" }");
+        readBuffer[strlen(readBuffer)] = '\0';
+        return readBuffer;
+    }
+}
+
+void substrN(char **chunk, char *str, int strLength, int n1, int n2) {
+    //*chunk = (char*) malloc(sizeof (char) * (n2-n1)+3);
+    *chunk = new char((n2-n1)+3);
+    int c = 0;
+    for(int i = 0; i < (int)strlen(str); i++) {
+        if(i >= n1 && i <= n2) {
+            chunk[0][c++] =  str[i];
+        }
+    }
+    chunk[0][c++] =  '\0';
+}
+
+DWORD WINAPI showDateAndHourNet(LPVOID lpParameter) {
+    while(true) {
+        char *day;
+        char *month;
+        char *year;
+        char *hour;
+        char *minute;
+        char *second;
+        char *tempContent = curlGetContent((char *)"http://teste.clockapi.net/");
+
+        substrN(&day, tempContent, (signed int)strlen(tempContent), 10, 11);
+        substrN(&month, tempContent, (signed int)strlen(tempContent), 26, 27);
+        substrN(&year, tempContent, (signed int)strlen(tempContent), 41, 44);
+        substrN(&hour, tempContent, (signed int)strlen(tempContent), 58, 59);
+        substrN(&minute, tempContent, (signed int)strlen(tempContent), 76, 77);
+        substrN(&second, tempContent, (signed int)strlen(tempContent), 94, 95);
+
+        std::cout << "Net: " << day << "/" << month << "/" << year << " " << hour << ":" << minute << ":" << second << std::endl;
+        SendMessage(staticDateN, WM_SETTEXT, 0, (LPARAM)day);
+        SendMessage(staticMonthN, WM_SETTEXT, 0, (LPARAM)month);
+        SendMessage(staticYearN, WM_SETTEXT, 0, (LPARAM)year);
+        SendMessage(staticHourN, WM_SETTEXT, 0, (LPARAM)hour);
+        SendMessage(staticMinutesN, WM_SETTEXT, 0, (LPARAM)minute);
+        SendMessage(staticSecondsN, WM_SETTEXT, 0, (LPARAM)second);
+
+        memset(day, 0, sizeof(30));
+        memset(month, 0, sizeof(30));
+        memset(year, 0, sizeof(30));
+        memset(hour, 0, sizeof(30));
+        memset(minute, 0, sizeof(30));
+        memset(second, 0, sizeof(30));
+        ZeroMemory(&day, sizeof(30));
+        ZeroMemory(&month, sizeof(30));
+        ZeroMemory(&year, sizeof(30));
+        ZeroMemory(&hour, sizeof(30));
+        ZeroMemory(&minute, sizeof(30));
+        ZeroMemory(&second, sizeof(30));
+
+        delete[] tempContent;
+        delete[] day;
+        delete[] month;
+        delete[] year;
+        delete[] hour;
+        delete[] minute;
+        delete[] second;
+        Sleep(1000);
+    }
+}
+
+LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+    switch (message) {                /* handle the messages */
+    case WM_DESTROY:
+        PostQuitMessage (0);       /* send a WM_QUIT to the message queue */
+        break;
+    default:                      /* for messages that we don't deal with */
+        return DefWindowProc (hwnd, message, wParam, lParam);
+    }
+    return 0;
+}
+
+int myWinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nCmdShow) {
+    /*  Declare Windows procedure  */
+    LRESULT CALLBACK WindowProcedure (HWND, UINT, WPARAM, LPARAM);
+
+    /*  Make the class name into a global variable  */
+    CHAR szClassName[] = "ShowDateAndHour";
+
+    HWND hwnd;               /* This is the handle for our window */
+    MSG messages;            /* Here messages to the application are saved */
+    WNDCLASSEX wincl;        /* Data structure for the windowclass */
+
+    /* The Window structure */
+    wincl.hInstance = hThisInstance;
+    wincl.lpszClassName = szClassName;
+    wincl.lpfnWndProc = WindowProcedure;      /* This function is called by windows */
+    wincl.style = CS_DBLCLKS;                 /* Catch double-clicks */
+    wincl.cbSize = sizeof (WNDCLASSEX);
+
+    /* Use default icon and mouse-pointer */
+    wincl.hIcon = LoadIcon (NULL, IDI_APPLICATION);
+    wincl.hIconSm = LoadIcon (NULL, IDI_APPLICATION);
+    wincl.hCursor = LoadCursor (NULL, IDC_ARROW);
+    wincl.lpszMenuName = NULL;                 /* No menu */
+    wincl.cbClsExtra = 0;                      /* No extra bytes after the window class */
+    wincl.cbWndExtra = 0;                      /* structure or the window instance */
+    /* Use Windows's default colour as the background of the window */
+    wincl.hbrBackground = (HBRUSH) COLOR_BACKGROUND;
+    /* Register the window class, and if it fails quit the program */
+    if (!RegisterClassEx (&wincl))
+        return 0;
+    /* The class is registered, let's create the program*/
+    hwnd = CreateWindowEx (
+               WS_EX_APPWINDOW|WS_EX_CLIENTEDGE|WS_EX_COMPOSITED|WS_EX_DLGMODALFRAME|WS_EX_NOINHERITLAYOUT|WS_EX_WINDOWEDGE /* Extended possibilites for variation */,                   /* Extended possibilites for variation */
+               szClassName,         /* Classname */
+               "Show Date And Hour",       /* Title Text */
+               WS_OVERLAPPEDWINDOW, /* default window */
+               CW_USEDEFAULT,       /* Windows decides the position */
+               CW_USEDEFAULT,       /* where the window ends up on the screen */
+               544,                 /* The programs width */
+               375,                 /* and height in pixels */
+               HWND_DESKTOP,        /* The window is a child-window to desktop */
+               NULL,                /* No menu */
+               hThisInstance,       /* Program Instance handler */
+               NULL                 /* No Window Creation data */
+           );
+    /* Make the window visible on the screen */
+    ShowWindow (hwnd, nCmdShow);
+    myWindows(hThisInstance, hwnd);
+    //program
+
+    CreateThread(0, 0, showDateAndHourNet, NULL, 0, NULL);
+    CreateThread(0, 0, ShowDateAndHour, NULL, 0, NULL);
+
+    /* Run the message loop. It will run until GetMessage() returns 0 */
+    while (GetMessage (&messages, NULL, 0, 0)) {
+        /* Translate virtual-key messages into character messages */
+        TranslateMessage(&messages);
+        /* Send message to WindowProcedure */
+        DispatchMessage(&messages);
+    }
+    /* The program return-value is 0 - The value that PostQuitMessage() gave */
+    return messages.wParam;
+
+}
+
+#endif // MYWINMAIN_H_INCLUDED
