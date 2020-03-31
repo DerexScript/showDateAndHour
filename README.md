@@ -4,6 +4,17 @@ Print's do programa aberto!
 
 ![alt text](https://uploaddeimagens.com.br/images/002/559/342/full/1.png)
 
+# Objetivo
+
+Caso queiram usar de exemplo para estudos!
+Projetinho em C++, que mostra a data e hora usando GUI (Interface Grafica)!
+
+Tanto data e hora local do pc, como de um serviço externo..
+Obs: O serviço externo vc tem que configurar no código fonte, o link!
+Atualmente ele está com um link simbólico, e é retornando uma data e hora estática.. Até que seja retirado o link simbólico!
+
+Obs. A resposta do servidor deve conter 100% o mesmo formato do JSON estático configurada no código fonte!
+
 ## License
 
 Este projeto está licenciado sob a licença MIT
