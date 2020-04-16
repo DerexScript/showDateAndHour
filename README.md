@@ -1,5 +1,4 @@
 # showDateAndHour
-Um simples programa, que armazena atalhos para jogos!
 Print's do programa aberto!
 
 ![alt text](https://uploaddeimagens.com.br/images/002/559/342/full/1.png)
